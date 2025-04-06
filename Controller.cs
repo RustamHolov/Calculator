@@ -1,12 +1,11 @@
 public class Controller
 {
-    private Input _input;
+
     private View _view;
     private Output _output;
     private Calculations _calc;
-    public Controller(Input input, View view, Output output, Calculations calc)
+    public Controller( View view, Output output, Calculations calc)
     {
-        _input = input;
         _view = view;
         _output = output;
         _calc = calc;
@@ -60,11 +59,7 @@ public class Controller
             x--;
         }
     }
-    public void OutputConsole(){
-        Console.Write(":");
-        Console.WriteLine(_output.Line);
-        Console.WriteLine("─────────────────────────────");
-    }
+    
     public void Enter() {
 
         switch (x,y){
@@ -74,7 +69,7 @@ public class Controller
             case (2,3):                                                                     // "-"
             case (3,3): Calculate(Output.buttons[x,y]); break;                              // "+"
             case (0,3): Backspace(); break;                                                 // "<"
-            case (0,1): Clear(); break;                                                     // "C"
+            case (0,1): ClearAll(); break;                                                  // "C"
             case (4,0): Negative(); break;                                                  // "+/-"
             case (4,3): Result(); break;                                                              // "="
             default: _output.Line += Output.buttons[x, y]; break;                               // ".,0,1,2,3,4,5,6,7,8,9"
@@ -95,7 +90,7 @@ public class Controller
         {
             _calc.Operation = operation;
             _calc.FirstOperand = _output.Line;
-            Clear();
+            ClearOutput();
         }else if(!string.IsNullOrEmpty(_calc.FirstOperand) && string.IsNullOrEmpty(_output.Line)){
             _calc.Operation = operation;
         }
@@ -104,7 +99,7 @@ public class Controller
             _calc.FirstOperand = _calc.Result();
             _calc.Operation = operation;
             _calc.SecondOperand = string.Empty;
-            Clear();
+            ClearOutput();
         }else{
             Result(operation);
         }
@@ -115,9 +110,8 @@ public class Controller
             _calc.FirstOperand = _calc.Result();
             _calc.Operation = operation ?? string.Empty;
             _calc.SecondOperand = string.Empty;
-            Clear();
+            ClearOutput();
         }
-        
     }
     public void Negative(){
         if(!string.IsNullOrEmpty(_output.Line)){
@@ -127,16 +121,22 @@ public class Controller
     public void Digit(string digit){
         _output.Line += digit;
     }
-    public void Clear(){
+    public void ClearOutput(){
         _output.Line = "";
+    }
+    public void ClearAll(){
+        _output.Line = "";
+        _calc.FirstOperand = "";
+        _calc.SecondOperand = "";
+        _calc.Operation = "";
     }
 
     public void MainFlow()
     {
         Console.Clear();
         _calc.Log();
-        OutputConsole();
-        Console.WriteLine("Press <ESC> to exit");
+        _view.OutputConsole(_output.Line);
+        _view.Welcome();
         _view.DisplayStringMatrix( Output.buttons, (x, y));
         ConsoleKeyInfo key;
         while(true){
@@ -149,6 +149,10 @@ public class Controller
                 case ConsoleKey.DownArrow or ConsoleKey.S: DownArrow(); break;
                 case ConsoleKey.Enter or ConsoleKey.Spacebar: Enter();break;
                 case ConsoleKey.Backspace: Backspace();break;
+                case ConsoleKey.Add: Calculate(Output.buttons[3, 3]); break;
+                case ConsoleKey.Divide: Calculate(Output.buttons[0, 2]); break;
+                case ConsoleKey.Subtract: Calculate(Output.buttons[2, 3]); break;
+                case ConsoleKey.Multiply: Calculate(Output.buttons[1, 3]); break;
                 default: if(char.IsDigit(key.KeyChar)) Digit(key.KeyChar.ToString()); break;
             }
             MainFlow();

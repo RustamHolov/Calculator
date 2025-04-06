@@ -49,9 +49,16 @@ public class View
                     leftPadding--;
                     rightPadding--;
                     cellContent = "[" + cellContent + "]";
+                    
+                    Console.Write(new string(' ', leftPadding));
+                    Console.ForegroundColor = ConsoleColor.Black;
+                    Console.BackgroundColor = ConsoleColor.Yellow;
+                    Console.Write(cellContent);
+                    Console.ResetColor();
+                    Console.Write(new string(' ', rightPadding) + "│");
+                }else{
+                    Console.Write(new string(' ', leftPadding) + cellContent + new string(' ', rightPadding) + "│");
                 }
-
-                Console.Write(new string(' ', leftPadding) + cellContent + new string(' ', rightPadding) + "│");
             }
             Console.WriteLine();
 
@@ -90,5 +97,18 @@ public class View
             }
         }
         Console.WriteLine(bottomBorder);
+    }
+    public void OutputConsole(string? output)
+    {
+        Console.Write("> ");
+        Console.WriteLine($"{output:N}");
+    }
+    public void Welcome(){
+        Console.WriteLine("─────────────────────────────");
+        Console.WriteLine("Press <ESC> to exit");
+        Console.WriteLine("Use \u2190\u2192\u2191\u2193 or WASD to navigate");
+        Console.WriteLine("Use <Enter> or <Spacebar> to select");
+        Console.WriteLine("─────────────────────────────");
+        Console.WriteLine("        CALCULATOR");
     }
 }
