@@ -1,17 +1,11 @@
-public class Controller
+﻿using System.Drawing;
+
+public class Controller(View view, Output output, Calculations calc)
 {
 
-    private View _view;
-    private Output _output;
-    private Calculations _calc;
-    public Controller(View view, Output output, Calculations calc)
-    {
-        _view = view;
-        _output = output;
-        _calc = calc;
-    }
-    static int[,] coords = new int[4, 5];
-
+    private readonly View _view = view;
+    private readonly Output _output = output;
+    private readonly Calculations _calc = calc;
     public int x = 4;
     public int y = 3;
 
@@ -69,13 +63,17 @@ public class Controller
             case (0, 2):                                                                     // "/"
             case (1, 3):                                                                     // "*"
             case (2, 3):                                                                     // "-"
-            case (3, 3): Calculate(Output.buttons[x, y]); break;                              // "+"
+            case (3, 3): Operate(Output.buttons[x, y]); break;                              // "+"
             case (0, 3): Backspace(); break;                                                 // "<"
             case (0, 1): ClearAll(); break;                                                  // "C"
+            case (4, 2): Dot(); break;
             case (4, 0): Negative(); break;                                                  // "+/-"
-            case (4, 3): Result(); break;                                                              // "="
-            default: _output.Line += Output.buttons[x, y]; break;                               // ".,0,1,2,3,4,5,6,7,8,9"
+            case (4, 3): Total(); break;                                                              // "="
+            default: _output.Line += Output.buttons[x, y]; break;                               // "0,1,2,3,4,5,6,7,8,9"
         }
+    }
+    public void Dot(){
+        _output.Line += _output.Line!=null && !_output.Line.Contains('.') ? Output.buttons[4,2] : ""; 
     }
     public void Backspace()
     {
@@ -84,7 +82,7 @@ public class Controller
             _output.Line = _output.Line.Remove(_output.Line.Length - 1, 1);
         }
     }
-    public void Calculate(string operation)
+    public void Operate(string operation)
     {
         if (string.IsNullOrEmpty(_output.Line) && string.IsNullOrEmpty(_calc.FirstOperand))
         {
@@ -112,10 +110,10 @@ public class Controller
         }
         else
         {
-            Result(operation);
+            Total(operation);
         }
     }
-    public void Result(string? operation = null)
+    public void Total(string? operation = null)
     { // set argument for series of operations
         if (!string.IsNullOrEmpty(_output.Line) && !string.IsNullOrEmpty(_calc.FirstOperand) && !string.IsNullOrEmpty(_calc.Operation))
         {
@@ -169,10 +167,10 @@ public class Controller
                 case ConsoleKey.DownArrow or ConsoleKey.S: Down(); break;
                 case ConsoleKey.Enter or ConsoleKey.Spacebar: Enter(); break;
                 case ConsoleKey.Backspace: Backspace(); break;
-                case ConsoleKey.Add: Calculate(Output.buttons[3, 3]); break;
-                case ConsoleKey.Divide: Calculate(Output.buttons[0, 2]); break;
-                case ConsoleKey.Subtract: Calculate(Output.buttons[2, 3]); break;
-                case ConsoleKey.Multiply: Calculate(Output.buttons[1, 3]); break;
+                case ConsoleKey.Add: Operate(Output.buttons[3, 3]); break;
+                case ConsoleKey.Divide: Operate(Output.buttons[0, 2]); break;
+                case ConsoleKey.Subtract: Operate(Output.buttons[2, 3]); break;
+                case ConsoleKey.Multiply: Operate(Output.buttons[1, 3]); break;
                 default: if (char.IsDigit(key.KeyChar)) Digit(key.KeyChar.ToString()); break;
             }
             MainFlow();

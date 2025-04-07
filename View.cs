@@ -109,10 +109,7 @@ public class View
     public static void Welcome()
     {
         Console.WriteLine("─────────────────────────────");
-        Console.WriteLine("Press <ESC> to exit");
-        Console.WriteLine("Use \u2191 or W to navigate");
-        Console.WriteLine("   \u2190\u2193\u2192  ASD    ");
-        Console.WriteLine("Use <Enter> or <Spacebar> to select");
+        Console.WriteLine("Press <ESC> to exit\nUse: arrows  (<- ^ v ->) or (WASD) to navigate\nUse <Enter> or <Spacebar> to select");
         Console.WriteLine("─────────────────────────────");
         Console.WriteLine("        CALCULATOR");
     }
