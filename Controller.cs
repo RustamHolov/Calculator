@@ -15,7 +15,7 @@ public class Controller
     public int x = 4;
     public int y = 3;
 
-    public void LeftArrow()
+    public void Left()
     {
         if (y == 0)
         {
@@ -26,7 +26,7 @@ public class Controller
             y--;
         }
     }
-    public void RightArrow()
+    public void Right()
     {
         if (y == _output.rows)
         {
@@ -37,7 +37,7 @@ public class Controller
             y++;
         }
     }
-    public void DownArrow()
+    public void Down()
     {
         if (x == _output.columns)
         {
@@ -48,7 +48,7 @@ public class Controller
             x++;
         }
     }
-    public void UpArrow()
+    public void Up()
     {
         if (x == 0)
         {
@@ -163,10 +163,10 @@ public class Controller
             switch (key.Key)
             {
                 case ConsoleKey.Escape: Console.Clear(); Environment.Exit(0); break;
-                case ConsoleKey.LeftArrow or ConsoleKey.A: LeftArrow(); break;
-                case ConsoleKey.RightArrow or ConsoleKey.D: RightArrow(); break;
-                case ConsoleKey.UpArrow or ConsoleKey.W: UpArrow(); break;
-                case ConsoleKey.DownArrow or ConsoleKey.S: DownArrow(); break;
+                case ConsoleKey.LeftArrow or ConsoleKey.A: Left(); break;
+                case ConsoleKey.RightArrow or ConsoleKey.D: Right(); break;
+                case ConsoleKey.UpArrow or ConsoleKey.W: Up(); break;
+                case ConsoleKey.DownArrow or ConsoleKey.S: Down(); break;
                 case ConsoleKey.Enter or ConsoleKey.Spacebar: Enter(); break;
                 case ConsoleKey.Backspace: Backspace(); break;
                 case ConsoleKey.Add: Calculate(Output.buttons[3, 3]); break;
