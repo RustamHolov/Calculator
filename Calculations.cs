@@ -49,21 +49,8 @@ public class Calculations
         };
     }
     public string Divide(){
-        if(ParseLong(out long l1, out long l2) && l1%l2 != 0 ||
-           ParseInt(out int i1, out int i2) && i1%i2 != 0 ||
-           ParseBigInt(out BigInteger b1, out BigInteger b2) && b1 % b2 != 0)
-        { // divided completely
-            ParseDouble(out double d1, out double d2);
-            return $"{d1/d2}";
-        }else{
-            return _type switch
-            {
-                "long" => $"{l1 / l2}" ,
-                "int" => $"{i1 / i2}",
-                "bigInt" => $"{b1 / b2}",
-                _ => ""
-            };
-        }
+        if(_type == "bigInt" && ParseBigInt(out BigInteger b1, out BigInteger b2)) return $"{b1/b2}";
+        else return ParseDouble(out double d1, out double d2) ? $"{d1/d2}" : "";
     }
     public string Precentage()
     {
