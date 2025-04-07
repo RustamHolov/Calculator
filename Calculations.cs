@@ -1,10 +1,8 @@
 
 using System.Numerics;
-using System.Reflection.Metadata;
 
 public class Calculations
 {
-
     private string _operation = string.Empty;
     private string _operand1 = string.Empty;
     private string _operand2 = string.Empty;
@@ -19,32 +17,34 @@ public class Calculations
     public string Res { get => _res; set => _res = value; }
     public string Type {get => _type; set => _type = value;}
 
+
     public string Add() {
         return _type switch{
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? (b1 + b2).ToString() : "",
-            "long" => ParseLong(out long l1, out long l2) ? (l1 + l2).ToString() : "",
-            "int" => ParseInt(out int i1, out int i2) ? (i1 + i2).ToString() : "",
-            "double" => ParseDouble(out double d1, out double d2) ? (d1 + d2).ToString() : "",
+            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 + b2}" : "",
+            "long" => ParseLong(out long l1, out long l2) ? $"{l1 + l2}" : "",
+            "int" => ParseInt(out int i1, out int i2) ? $"{i1 + i2}" : "",
+            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 + d2}" : "",
             _ => ""
         };
-    }
-    public string Minus(){
+    }  
+
+    public string Subtract(){
         return _type switch
         {
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? (b1 - b2).ToString() : "",
-            "long" => ParseLong(out long l1, out long l2) ? (l1 - l2).ToString() : "",
-            "int" => ParseInt(out int i1, out int i2) ? (i1 - i2).ToString() : "",
-            "double" => ParseDouble(out double d1, out double d2) ? (d1 - d2).ToString() : "",
+            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 - b2}" : "",
+            "long" => ParseLong(out long l1, out long l2) ? $"{l1 - l2}" : "",
+            "int" => ParseInt(out int i1, out int i2) ? $"{i1 - i2}" : "",
+            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 - d2}" : "",
             _ => ""
         };
     }
     public string Multiply(){
         return _type switch
         {
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? (b1 * b2).ToString() : "",
-            "long" => ParseLong(out long l1, out long l2) ? (l1 * l2).ToString() : "",
-            "int" => ParseInt(out int i1, out int i2) ? (i1 * i2).ToString() : "",
-            "double" => ParseDouble(out double d1, out double d2) ? (d1 * d2).ToString() : "",
+            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 * b2}" : "",
+            "long" => ParseLong(out long l1, out long l2) ? $"{l1 * l2}" : "",
+            "int" => ParseInt(out int i1, out int i2) ? $"{i1 * i2}" : "",
+            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 * d2}" : "",
             _ => ""
         };
     }
@@ -54,13 +54,13 @@ public class Calculations
            ParseBigInt(out BigInteger b1, out BigInteger b2) && b1 % b2 != 0)
         { // divided completely
             ParseDouble(out double d1, out double d2);
-            return (d1/d2).ToString();
+            return $"{d1/d2}";
         }else{
             return _type switch
             {
-                "long" => (l1 / l2).ToString() ,
-                "int" => (i1 / i2).ToString() ,
-                "bigInt" => (b1 / b2).ToString(),
+                "long" => $"{l1 / l2}" ,
+                "int" => $"{i1 / i2}",
+                "bigInt" => $"{b1 / b2}",
                 _ => ""
             };
         }
@@ -73,60 +73,27 @@ public class Calculations
 
 
     public bool ParseDouble(out double operand1, out double operand2){
-        if(Double.TryParse(_operand1, out double d1) && Double.TryParse(_operand2, out double d2)){
-            operand1 = d1;
-            operand2 = d2;
-            return true;
-        }else{
-            operand1 = 0;
-            operand2 = 0;
-            return false;
-        }
+        bool success1 = double.TryParse(_operand1, out operand1);
+        bool success2 = double.TryParse(_operand2,out operand2);
+        return success1 && success2;
     }
     public bool ParseInt(out int operand1, out int operand2)
     {
-        if (int.TryParse(_operand1, out int i1) && int.TryParse(_operand2, out int i2))
-        {
-            operand1 = i1;
-            operand2 = i2;
-            return true;
-        }
-        else
-        {
-            operand1 = 0;
-            operand2 = 0;
-            return false;
-        }
+        bool success1 = int.TryParse(_operand1, out operand1);
+        bool success2 = int.TryParse(_operand2, out operand2);
+        return success1 && success2;
     }
     public bool ParseLong(out long operand1, out long operand2)
     {
-        if (long.TryParse(_operand1, out long l1) && long.TryParse(_operand2, out long l2))
-        {
-            operand1 = l1;
-            operand2 = l2;
-            return true;
-        }
-        else
-        {
-            operand1 = 0;
-            operand2 = 0;
-            return false;
-        }
+        bool success1 = long.TryParse(_operand1, out operand1);
+        bool success2 = long.TryParse(_operand2, out operand2);
+        return success1 && success2;
     }
     public bool ParseBigInt(out BigInteger operand1, out BigInteger operand2)
     {
-        if (BigInteger.TryParse(_operand1, out BigInteger b1) && BigInteger.TryParse(_operand2, out BigInteger b2))
-        {
-            operand1 = b1;
-            operand2 = b2;
-            return true;
-        }
-        else
-        {
-            operand1 = 0;
-            operand2 = 0;
-            return false;
-        }
+        bool success1 = BigInteger.TryParse(_operand1, out operand1);
+        bool success2 = BigInteger.TryParse(_operand2, out operand2);
+        return success1 && success2;
     }
 
     // BigInteger
@@ -136,8 +103,8 @@ public class Calculations
         bool _double = _operand1.Contains('.') || _operand2.Contains('.');
         _type = "" switch{
             _ when _double => "double",
-            _ when _long => "long",
             _ when _bigInt => "bigInt",
+            _ when _long => "long",
             _ => "int"
         };
     }
@@ -147,7 +114,7 @@ public class Calculations
             return _operation switch
             {
                 "+" => Add(),
-                "-" => Minus(),
+                "-" => Subtract(),
                 "*" => Multiply(),
                 "/" => Divide(),
                 "%" => Precentage(),
@@ -158,9 +125,5 @@ public class Calculations
             throw new ArgumentException("Missing Argument");
         }
     }
-    public void Log(){
-        Console.WriteLine(FirstOperand);
-        Console.WriteLine(Operation);
-        Console.WriteLine(SecondOperand);
-    }
+    
 }

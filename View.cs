@@ -1,7 +1,7 @@
 public class View
 {
 
-    public void DisplayStringMatrix(string[,] buttons, (int x, int y)? coords = null)
+    public static void DisplayStringMatrix(string[,] buttons, (int x, int y)? coords = null)
     {
         int rows = buttons.GetLength(0);
         int cols = buttons.GetLength(1);
@@ -45,18 +45,21 @@ public class View
                 int padding = maxCellWidth - cellContent.Length;
                 int leftPadding = padding / 2;
                 int rightPadding = padding - leftPadding;
-                if(coords != null && (i,j)==coords){
+                if (coords != null && (i, j) == coords)
+                {
                     leftPadding--;
                     rightPadding--;
                     cellContent = "[" + cellContent + "]";
-                    
+
                     Console.Write(new string(' ', leftPadding));
                     Console.ForegroundColor = ConsoleColor.Black;
                     Console.BackgroundColor = ConsoleColor.Yellow;
                     Console.Write(cellContent);
                     Console.ResetColor();
                     Console.Write(new string(' ', rightPadding) + "│");
-                }else{
+                }
+                else
+                {
                     Console.Write(new string(' ', leftPadding) + cellContent + new string(' ', rightPadding) + "│");
                 }
             }
@@ -98,17 +101,25 @@ public class View
         }
         Console.WriteLine(bottomBorder);
     }
-    public void OutputConsole(string? output)
+    public static void OutputConsole(string? output)
     {
         Console.Write("> ");
         Console.WriteLine($"{output:N}");
     }
-    public void Welcome(){
+    public static void Welcome()
+    {
         Console.WriteLine("─────────────────────────────");
         Console.WriteLine("Press <ESC> to exit");
-        Console.WriteLine("Use \u2190\u2192\u2191\u2193 or WASD to navigate");
+        Console.WriteLine("Use \u2191 or W to navigate");
+        Console.WriteLine("   \u2190\u2193\u2192  ASD    ");
         Console.WriteLine("Use <Enter> or <Spacebar> to select");
         Console.WriteLine("─────────────────────────────");
         Console.WriteLine("        CALCULATOR");
+    }
+    public static void Log(string firstOperand, string operation, string secondOperand)
+    {
+        Console.WriteLine(firstOperand);
+        Console.WriteLine(operation);
+        Console.WriteLine(secondOperand);
     }
 }
