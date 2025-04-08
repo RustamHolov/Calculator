@@ -1,5 +1,6 @@
 
 using System.Numerics;
+using System.Globalization;
 
 public class Calculations
 {
@@ -17,72 +18,56 @@ public class Calculations
     public string Res { get => _res; set => _res = value; }
     public string Type {get => _type; set => _type = value;}
 
-
+    public static T Add<T> (T a, T b) where T : INumber<T> => a + b;
+    public static T Subtract<T> (T a, T b) where T : INumber<T> => a - b;
+    public static T Multiply<T> (T a, T b) where T : INumber<T> => a * b;
+    public static T Divide<T> (T a, T b) where T : INumber<T> => a / b;
+    public static T Precentage<T> (T a, T b) where T : INumber<T> => b % a;
+    public bool ParseGeneric<T>(out T? o1, out T? o2) where T : INumber<T>
+    {
+        bool success1 = T.TryParse(_operand1, CultureInfo.InvariantCulture, out o1);
+        bool success2 = T.TryParse(_operand2, CultureInfo.InvariantCulture, out o2);
+        return success1 && success2;
+    }
+    public delegate bool ParseDelegate<T> (out T o1, out T o2);
+    public string Operate<T>(Func<T?,T?,T> operation) where T: INumber<T>{
+         return  ParseGeneric<T>(out T? o1, out T? o2) ? $"{operation(o1, o2)}" : "fail calculation";
+    }
     public string Add() {
         return _type switch{
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 + b2}" : "",
-            "long" => ParseLong(out long l1, out long l2) ? $"{l1 + l2}" : "",
-            "int" => ParseInt(out int i1, out int i2) ? $"{i1 + i2}" : "",
-            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 + d2}" : "",
+            "bigInt" => Operate<BigInteger>(Add),
+            "long" => Operate<long>(Add),
+            "int" => Operate<int>(Add),
+            "double" => Operate<double>(Add),
             _ => ""
         };
-    }  
+    }
 
     public string Subtract(){
         return _type switch
         {
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 - b2}" : "",
-            "long" => ParseLong(out long l1, out long l2) ? $"{l1 - l2}" : "",
-            "int" => ParseInt(out int i1, out int i2) ? $"{i1 - i2}" : "",
-            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 - d2}" : "",
+            "bigInt" => Operate<BigInteger>(Subtract),
+            "long" => Operate<long>(Subtract),
+            "int" => Operate<int>(Subtract),
+            "double" => Operate<double>(Subtract),
             _ => ""
         };
     }
     public string Multiply(){
         return _type switch
         {
-            "bigInt" => ParseBigInt(out BigInteger b1, out BigInteger b2) ? $"{b1 * b2}" : "",
-            "long" => ParseLong(out long l1, out long l2) ? $"{l1 * l2}" : "",
-            "int" => ParseInt(out int i1, out int i2) ? $"{i1 * i2}" : "",
-            "double" => ParseDouble(out double d1, out double d2) ? $"{d1 * d2}" : "",
+            "bigInt" => Operate<BigInteger>(Multiply),
+            "long" => Operate<long>(Multiply),
+            "int" => Operate<int>(Multiply),
+            "double" => Operate<double>(Multiply),
             _ => ""
         };
     }
-    public string Divide(){
-        if(_type == "bigInt" && ParseBigInt(out BigInteger b1, out BigInteger b2)) return $"{b1/b2}";
-        else return ParseDouble(out double d1, out double d2) ? $"{d1/d2}" : "";
-    }
-    public string Precentage()
-    {
-        return ParseDouble(out double d1, out double d2) ? (d2 / 100 * d1).ToString() : "";
-    }
+    public string Divide() => Operate<decimal>(Divide);
+    public string Precentage() => ParseGeneric(out double dc1, out double dc2) ? $"{dc2/100 * dc1 :N}" : "fail calculation";
 
 
-
-    public bool ParseDouble(out double operand1, out double operand2){
-        bool success1 = double.TryParse(_operand1, out operand1);
-        bool success2 = double.TryParse(_operand2,out operand2);
-        return success1 && success2;
-    }
-    public bool ParseInt(out int operand1, out int operand2)
-    {
-        bool success1 = int.TryParse(_operand1, out operand1);
-        bool success2 = int.TryParse(_operand2, out operand2);
-        return success1 && success2;
-    }
-    public bool ParseLong(out long operand1, out long operand2)
-    {
-        bool success1 = long.TryParse(_operand1, out operand1);
-        bool success2 = long.TryParse(_operand2, out operand2);
-        return success1 && success2;
-    }
-    public bool ParseBigInt(out BigInteger operand1, out BigInteger operand2)
-    {
-        bool success1 = BigInteger.TryParse(_operand1, out operand1);
-        bool success2 = BigInteger.TryParse(_operand2, out operand2);
-        return success1 && success2;
-    }
-
+    
     // BigInteger
     public void ConfirmTheType(){
         bool _bigInt = _operand1.Length > 17 || _operand2.Length > 17;
