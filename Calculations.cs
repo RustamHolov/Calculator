@@ -17,7 +17,8 @@ public class Calculations
     public string SecondOperand { get => _operand2; set => _operand2 = value; }
     public string Res { get => _res; set => _res = value; }
     public string Type {get => _type; set => _type = value;}
-
+    public enum OperationKind { Add, Subtract, Multiply, Divide };
+    public enum DataType {BigInteger, Long, Int, Double, Decimal};
     public static T Add<T> (T a, T b) where T : INumber<T> => a + b;
     public static T Subtract<T> (T a, T b) where T : INumber<T> => a - b;
     public static T Multiply<T> (T a, T b) where T : INumber<T> => a * b;
@@ -65,15 +66,15 @@ public class Calculations
             return "Error: Failed to parse one or both operands.";
         }
     }
-    public enum OperationKind{Add, Subtract, Multiply, Divide};
+    
     public string Calculate(OperationKind kind){
         try{
-            return _type switch{
-                "bigInt" => ExecuteOperation<BigInteger>(kind),
-                "long" => ExecuteOperation<long>(kind),
-                "int" => ExecuteOperation<int>(kind),
-                "double" => ExecuteOperation<double>(kind),
-                "decimal" => ExecuteOperation<decimal>(kind),
+            return ConfirmType() switch{
+                DataType.BigInteger => ExecuteOperation<BigInteger>(kind),
+                DataType.Long => ExecuteOperation<long>(kind),
+                DataType.Int => ExecuteOperation<int>(kind),
+                DataType.Double => ExecuteOperation<double>(kind),
+                DataType.Decimal => ExecuteOperation<decimal>(kind),
                 _ => throw new NotSupportedException($"Data type '{_type}' is not supported.")
             };
         }catch(Exception ex){
@@ -93,22 +94,21 @@ public class Calculations
     
 
     // BigInteger
-    public void ConfirmTheType(){
+    public DataType ConfirmType(){
         bool _double = _operand1.Contains('.') || _operand2.Contains('.');
         bool _bigInt = _operand1.Length > 17 || _operand2.Length > 17;
         bool _long = _operand1.Length > 9 || _operand2.Length > 9 ;
         bool _int = !_operand1.Contains('.') && _operand1.Length < 9 || !_operand2.Contains('.') && _operand2.Length < 9;
-        _type = "" switch{
-            _ when _double => "double",
-            _ when _bigInt => "bigInt",
-            _ when _long => "long",
-            _ when _int => "int",
-            _ => "decimal"
+        return new DataType() switch{
+            _ when _double => DataType.Double,
+            _ when _bigInt => DataType.BigInteger,
+            _ when _long => DataType.Long,
+            _ when _int => DataType.Int,
+            _ => DataType.Decimal
         };
     }
     public string Result(){
         if(!string.IsNullOrEmpty(_operand1) && !string.IsNullOrEmpty(_operand2)){
-            ConfirmTheType();
             return _operation switch
             {
                 "+" => Calculate(OperationKind.Add),
