@@ -22,62 +22,88 @@ public class Calculations
     public static T Subtract<T> (T a, T b) where T : INumber<T> => a - b;
     public static T Multiply<T> (T a, T b) where T : INumber<T> => a * b;
     public static T Divide<T> (T a, T b) where T : INumber<T> => a / b;
-    public static T Precentage<T> (T a, T b) where T : INumber<T> => b % a;
-    public bool ParseGeneric<T>(out T? o1, out T? o2) where T : INumber<T>
+    public string Precentage() => ParseGeneric(out double dc1, out double dc2) ? $"{dc2 / 100 * dc1:N}" : "fail calculation";
+    public bool ParseGeneric<T>(out T o1, out T o2) where T : INumber<T>
     {
-        bool success1 = T.TryParse(_operand1, CultureInfo.InvariantCulture, out o1);
-        bool success2 = T.TryParse(_operand2, CultureInfo.InvariantCulture, out o2);
-        return success1 && success2;
+        bool success1 = T.TryParse(_operand1, CultureInfo.InvariantCulture, out T? parsed1);
+        bool success2 = T.TryParse(_operand2, CultureInfo.InvariantCulture, out T? parsed2);
+        if (success1 && success2){
+            o1 = parsed1!;
+            o2 = parsed2!;
+            return true;
+        }else{
+            o1 = default!;
+            o2 = default!;
+            return false;
+        }
     }
-    public delegate bool ParseDelegate<T> (out T o1, out T o2);
-    public string Operate<T>(Func<T?,T?,T> operation) where T: INumber<T>{
-         return  ParseGeneric<T>(out T? o1, out T? o2) ? $"{operation(o1, o2)}" : "fail calculation";
-    }
-    public string Add() {
-        return _type switch{
-            "bigInt" => Operate<BigInteger>(Add),
-            "long" => Operate<long>(Add),
-            "int" => Operate<int>(Add),
-            "double" => Operate<double>(Add),
-            _ => ""
-        };
-    }
-
-    public string Subtract(){
-        return _type switch
+    public string Operate<T>(Func<T, T, T> operation) where T: INumber<T>
+    {
+        if (ParseGeneric(out T operand1Value, out T operand2Value))
         {
-            "bigInt" => Operate<BigInteger>(Subtract),
-            "long" => Operate<long>(Subtract),
-            "int" => Operate<int>(Subtract),
-            "double" => Operate<double>(Subtract),
-            _ => ""
-        };
-    }
-    public string Multiply(){
-        return _type switch
+            try
+            {
+                T result = operation(operand1Value, operand2Value);
+                return result?.ToString() ?? "Result formatting failed";
+            }
+            catch (DivideByZeroException) // 
+            {
+                return "Error: Division by zero.";
+            }
+            catch (OverflowException )
+            {
+
+                return "Error: Arithmetic overflow during calculation.";
+            }
+            catch (Exception ex) 
+            {
+                return $"Error during calculation: {ex.Message}";
+            }
+        }
+        else
         {
-            "bigInt" => Operate<BigInteger>(Multiply),
-            "long" => Operate<long>(Multiply),
-            "int" => Operate<int>(Multiply),
-            "double" => Operate<double>(Multiply),
-            _ => ""
-        };
+            return "Error: Failed to parse one or both operands.";
+        }
     }
-    public string Divide() => Operate<decimal>(Divide);
-    public string Precentage() => ParseGeneric(out double dc1, out double dc2) ? $"{dc2/100 * dc1 :N}" : "fail calculation";
-
-
+    public enum OperationKind{Add, Subtract, Multiply, Divide};
+    public string Calculate(OperationKind kind){
+        try{
+            return _type switch{
+                "bigInt" => ExecuteOperation<BigInteger>(kind),
+                "long" => ExecuteOperation<long>(kind),
+                "int" => ExecuteOperation<int>(kind),
+                "double" => ExecuteOperation<double>(kind),
+                "decimal" => ExecuteOperation<decimal>(kind),
+                _ => throw new NotSupportedException($"Data type '{_type}' is not supported.")
+            };
+        }catch(Exception ex){
+            return $"Error: {ex.Message}";
+        }
+    }
+    public string ExecuteOperation<T>(OperationKind kind) where T: INumber<T>{
+        Func<T,T,T> opeartion = kind switch{
+            OperationKind.Add => Add,
+            OperationKind.Subtract => Subtract,
+            OperationKind.Multiply => Multiply,
+            OperationKind.Divide => Divide,
+            _ => throw new ArgumentOutOfRangeException($"Unknown or unsupported operation kind: {kind}")
+        };
+        return Operate(opeartion);
+    }
     
+
     // BigInteger
     public void ConfirmTheType(){
+        bool _double = _operand1.Contains('.') || _operand2.Contains('.');
         bool _bigInt = _operand1.Length > 17 || _operand2.Length > 17;
         bool _long = _operand1.Length > 9 || _operand2.Length > 9 ;
-        bool _double = _operand1.Contains('.') || _operand2.Contains('.');
+        bool _int = !_operand1.Contains('.') && _operand1.Length < 9 || !_operand2.Contains('.') && _operand2.Length < 9;
         _type = "" switch{
             _ when _double => "double",
             _ when _bigInt => "bigInt",
             _ when _long => "long",
-            _ => "int"
+            _ when _int => "int",
+            _ => "decimal"
         };
     }
     public string Result(){
@@ -85,10 +111,10 @@ public class Calculations
             ConfirmTheType();
             return _operation switch
             {
-                "+" => Add(),
-                "-" => Subtract(),
-                "*" => Multiply(),
-                "/" => Divide(),
+                "+" => Calculate(OperationKind.Add),
+                "-" => Calculate(OperationKind.Subtract),
+                "*" => Calculate(OperationKind.Multiply),
+                "/" => Calculate(OperationKind.Divide),
                 "%" => Precentage(),
                 _ => throw new ArgumentException("Fail converting"),
             };
