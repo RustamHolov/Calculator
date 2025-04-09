@@ -6,7 +6,7 @@ public class Controller(View view, Output output, Calculations calc)
     private readonly View _view = view;
     private readonly Output _output = output;
     private readonly Calculations _calc = calc;
-    public int x = 4;
+    public int x = 5;
     public int y = 3;
 
     public void Left()
@@ -59,21 +59,25 @@ public class Controller(View view, Output output, Calculations calc)
 
         switch (x, y)
         {
-            case (0, 0):                                                                     // "%"
-            case (0, 2):                                                                     // "/"
-            case (1, 3):                                                                     // "*"
-            case (2, 3):                                                                     // "-"
-            case (3, 3): Operate(Output.buttons[x, y]); break;                              // "+"
-            case (0, 3): Backspace(); break;                                                 // "<"
-            case (0, 1): ClearAll(); break;                                                  // "C"
-            case (4, 2): Dot(); break;
-            case (4, 0): Negative(); break;                                                  // "+/-"
-            case (4, 3): Total(); break;                                                              // "="
+            case (0,0): //sqr
+            case (0,1): //fib
+            case (0,2): //!
+            case (0,3): //notset
+            case (1, 0):                                                                     // "%"
+            case (1, 2):                                                                     // "/"
+            case (2, 3):                                                                     // "*"
+            case (3, 3):                                                                     // "-"
+            case (4, 3): Operation(Output.buttons[x, y]); break;                               // "+"
+            case (1, 3): Backspace(); break;                                                 // "<"
+            case (1, 1): ClearAll(); break;                                                  // "C"
+            case (5, 2): Dot(); break;
+            case (5, 0): Negative(); break;                                                  // "+/-"
+            case (5, 3): Total(); break;                                                              // "="
             default: _output.Line += Output.buttons[x, y]; break;                               // "0,1,2,3,4,5,6,7,8,9"
         }
     }
     public void Dot(){
-        _output.Line += _output.Line!=null && !_output.Line.Contains('.') ? Output.buttons[4,2] : ""; 
+        _output.Line += _output.Line!=null && !_output.Line.Contains('.') ? Output.buttons[5,2] : ""; 
     }
     public void Backspace()
     {
@@ -82,44 +86,44 @@ public class Controller(View view, Output output, Calculations calc)
             _output.Line = _output.Line.Remove(_output.Line.Length - 1, 1);
         }
     }
-    public void Operate(string operation)
+    public void Operation(string @operator)
     {
         if (string.IsNullOrEmpty(_output.Line) && string.IsNullOrEmpty(_calc.FirstOperand))
         {
-            if (operation == "-")
+            if (@operator == "-")
             {
                 Negative();
             }
         }
         else if (string.IsNullOrEmpty(_calc.Operation) && !string.IsNullOrEmpty(_output.Line))
         {
-            _calc.Operation = operation;
+            _calc.Operation = @operator;
             _calc.FirstOperand = _output.Line;
             ClearOutput();
         }
         else if (!string.IsNullOrEmpty(_calc.FirstOperand) && string.IsNullOrEmpty(_output.Line))
         {
-            _calc.Operation = operation;
+            _calc.Operation = @operator;
         }
         else if (!string.IsNullOrEmpty(_calc.SecondOperand))
         {
             _calc.FirstOperand = _calc.Result();
-            _calc.Operation = operation;
+            _calc.Operation = @operator;
             _calc.SecondOperand = string.Empty;
             ClearOutput();
         }
         else
         {
-            Total(operation);
+            Total(@operator);
         }
     }
-    public void Total(string? operation = null)
+    public void Total(string? @operator = null)
     { // set argument for series of operations
         if (!string.IsNullOrEmpty(_output.Line) && !string.IsNullOrEmpty(_calc.FirstOperand) && !string.IsNullOrEmpty(_calc.Operation))
         {
             _calc.SecondOperand = _output.Line;
             _calc.FirstOperand = _calc.Result();
-            _calc.Operation = operation ?? string.Empty;
+            _calc.Operation = @operator ?? string.Empty;
             _calc.SecondOperand = string.Empty;
             ClearOutput();
         }
@@ -148,32 +152,31 @@ public class Controller(View view, Output output, Calculations calc)
     }
 
     public void MainFlow()
-    {
-        Console.Clear();
-        View.Log(_calc.FirstOperand, _calc.Operation, _calc.SecondOperand);
-        View.OutputConsole(_output.Line);
-        View.Welcome();
-        View.DisplayStringMatrix(Output.buttons, (x, y));
-        ConsoleKeyInfo key;
+    { 
         while (true)
         {
+            Console.Clear();
+            View.Log(_calc.FirstOperand, _calc.Operation, _calc.SecondOperand);
+            View.OutputConsole(_output.Line);
+            View.Welcome();
+            View.DisplayStringMatrix(Output.buttons, (x, y));
+            ConsoleKeyInfo key;
             key = Console.ReadKey(true);
             switch (key.Key)
             {
                 case ConsoleKey.Escape: Console.Clear(); Environment.Exit(0); break;
-                case ConsoleKey.LeftArrow or ConsoleKey.A: Left(); break;
-                case ConsoleKey.RightArrow or ConsoleKey.D: Right(); break;
-                case ConsoleKey.UpArrow or ConsoleKey.W: Up(); break;
-                case ConsoleKey.DownArrow or ConsoleKey.S: Down(); break;
-                case ConsoleKey.Enter or ConsoleKey.Spacebar: Enter(); break;
-                case ConsoleKey.Backspace: Backspace(); break;
-                case ConsoleKey.Add: Operate(Output.buttons[3, 3]); break;
-                case ConsoleKey.Divide: Operate(Output.buttons[0, 2]); break;
-                case ConsoleKey.Subtract: Operate(Output.buttons[2, 3]); break;
-                case ConsoleKey.Multiply: Operate(Output.buttons[1, 3]); break;
-                default: if (char.IsDigit(key.KeyChar)) Digit(key.KeyChar.ToString()); break;
+                case ConsoleKey.LeftArrow or ConsoleKey.A: Left(); continue;
+                case ConsoleKey.RightArrow or ConsoleKey.D: Right(); continue;
+                case ConsoleKey.UpArrow or ConsoleKey.W: Up(); continue;
+                case ConsoleKey.DownArrow or ConsoleKey.S: Down(); continue;
+                case ConsoleKey.Enter or ConsoleKey.Spacebar: Enter(); continue;
+                case ConsoleKey.Backspace: Backspace(); continue;
+                case ConsoleKey.Add: Operation(Output.buttons[4, 3]); continue;
+                case ConsoleKey.Divide: Operation(Output.buttons[1, 2]); continue;
+                case ConsoleKey.Subtract: Operation(Output.buttons[3, 3]); continue;
+                case ConsoleKey.Multiply: Operation(Output.buttons[2, 3]); continue;
+                default: if (char.IsDigit(key.KeyChar)) Digit(key.KeyChar.ToString()); continue;
             }
-            MainFlow();
         }
     }
 }

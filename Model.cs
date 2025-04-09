@@ -5,8 +5,9 @@ public class Output
         get{ return line;}
         set { line = !string.IsNullOrEmpty(value) ? value : "";}
     }
-    public static string[,] buttons = new string[5, 4]
+    public static string[,] buttons = new string[6, 4]
         {
+            { "sqr", "fib", "!", ""},
             { "%", "C", "/", "<"},
             { "7", "8", "9", "*"},
             { "4", "5", "6" , "-"},

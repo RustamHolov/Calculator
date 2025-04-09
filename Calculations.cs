@@ -23,7 +23,8 @@ public class Calculations
     public static T Subtract<T> (T a, T b) where T : INumber<T> => a - b;
     public static T Multiply<T> (T a, T b) where T : INumber<T> => a * b;
     public static T Divide<T> (T a, T b) where T : INumber<T> => a / b;
-    public string Precentage() => ParseGeneric(out double dc1, out double dc2) ? $"{dc2 / 100 * dc1:N}" : "fail calculation";
+    
+    public string Precentage() => ParseGeneric(out decimal dc1, out decimal dc2) ? $"{dc2 / 100 * dc1:N}" : "fail calculation";
     public bool ParseGeneric<T>(out T o1, out T o2) where T : INumber<T>
     {
         bool success1 = T.TryParse(_operand1, CultureInfo.InvariantCulture, out T? parsed1);
@@ -45,7 +46,7 @@ public class Calculations
             try
             {
                 T result = operation(operand1Value, operand2Value);
-                return result?.ToString() ?? "Result formatting failed";
+                return result.ToString() ?? throw new NotSupportedException("Unsupported data type");
             }
             catch (DivideByZeroException) // 
             {
@@ -92,20 +93,33 @@ public class Calculations
         return Operate(opeartion);
     }
     
+    
+    public DataType ConfirmType()
+    {
+        if (double.TryParse(_operand1, NumberStyles.Any, CultureInfo.InvariantCulture, out _) ||
+            double.TryParse(_operand2, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
+        {
+            return DataType.Double;
+        }
+        if (decimal.TryParse(_operand1, NumberStyles.Any, CultureInfo.InvariantCulture, out _) ||
+            decimal.TryParse(_operand2, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
+        {
+            return DataType.Decimal;
+        }
+        if (BigInteger.TryParse(_operand1, out _) || BigInteger.TryParse(_operand2, out _))
+        {
+            return DataType.BigInteger;
+        }
+        if (long.TryParse(_operand1, out _) || long.TryParse(_operand2, out _))
+        {
+            return DataType.Long;
+        }
+        if (int.TryParse(_operand1, out _) || int.TryParse(_operand2, out _))
+        {
+            return DataType.Int;
+        }
 
-    // BigInteger
-    public DataType ConfirmType(){
-        bool _double = _operand1.Contains('.') || _operand2.Contains('.');
-        bool _bigInt = _operand1.Length > 17 || _operand2.Length > 17;
-        bool _long = _operand1.Length > 9 || _operand2.Length > 9 ;
-        bool _int = !_operand1.Contains('.') && _operand1.Length < 9 || !_operand2.Contains('.') && _operand2.Length < 9;
-        return new DataType() switch{
-            _ when _double => DataType.Double,
-            _ when _bigInt => DataType.BigInteger,
-            _ when _long => DataType.Long,
-            _ when _int => DataType.Int,
-            _ => DataType.Decimal
-        };
+        throw new ArgumentException("Invalid input: Cannot determine data type.");
     }
     public string Result(){
         if(!string.IsNullOrEmpty(_operand1) && !string.IsNullOrEmpty(_operand2)){
